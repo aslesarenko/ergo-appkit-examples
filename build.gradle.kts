@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.ergoplatform"
-version = "3.1.0-SNAPSHOT"
+version = "3.1.0"  // first two numbers correspond to appkit release
 
 val ivyDir = "${System.getProperties().getProperty("user.home")}/.ivy2/local"
 

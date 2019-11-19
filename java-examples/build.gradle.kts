@@ -9,17 +9,18 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
 
     ivy(ivyDir) {
-        layout("ivy") {
+        layout("ivy")
+        patternLayout {
             artifactPattern("${ivyDir}/[organisation]/[module]/[revision]/[type]s/[artifact](-[classifier])(.[ext])")
         }
     }
 }
 
 dependencies {
-    testCompile("junit", "junit", "4.12")
-    compile("org.ergoplatform", "ergo-appkit_2.12", "3.1.0", "compile")
+    testImplementation("junit", "junit", "4.12")
+    implementation("org.ergoplatform", "ergo-appkit_2.12", "3.1.0", "compile")
 }
 
-configure<JavaPluginConvention> {
+java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }

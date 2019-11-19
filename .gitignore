@@ -6,3 +6,5 @@ build
 gradle
 /local.properties
 out/
+c-examples/.idea
+c-examples/cmake-build-debug

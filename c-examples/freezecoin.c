@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <graal_isolate.h>
 #include <libergotool.h>
 
 int main(int argc, char **argv) {
@@ -13,7 +12,6 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  // hash mock transaction to obtain id
   char * configFileName = "ergotool.json";
 
   // get amountToSend from cmd args and call transaction creation
@@ -28,6 +26,5 @@ int main(int argc, char **argv) {
     fprintf(stderr, "graal_detach_thread error\n");
     return 1;
   }
-  
   return 0;
 }

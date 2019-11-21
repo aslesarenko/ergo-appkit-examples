@@ -1,9 +1,8 @@
 package org.ergoplatform.appkit.examples;
 
 import org.ergoplatform.appkit.*;
-import org.ergoplatform.ergotool.ErgoNodeConfig;
-import org.ergoplatform.ergotool.ErgoToolConfig;
-import org.ergoplatform.example.util.RestApiErgoClient;
+import org.ergoplatform.appkit.config.ErgoNodeConfig;
+import org.ergoplatform.appkit.config.ErgoToolConfig;
 import org.graalvm.nativeimage.IsolateThread;
 import org.graalvm.nativeimage.c.function.CEntryPoint;
 import org.graalvm.nativeimage.c.type.CCharPointer;

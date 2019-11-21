@@ -37,10 +37,10 @@ txJson = ergoClient.execute(lambda {|ctx|  # note, we use lambda to convert code
         .value(amountToPay)
         .contract(ctx.compileContract(
             ConstantsBuilder.create()
-                .item("deadline", ctx.getHeight() + newBoxSpendingDelay)
+                .item("freezeDeadline", ctx.getHeight() + newBoxSpendingDelay)
                 .item("pkOwner", prover.getP2PKAddress().pubkey())
                 .build(),
-            "{ sigmaProp(HEIGHT > deadline) && pkOwner }"))
+            "{ sigmaProp(HEIGHT > freezeDeadline) && pkOwner }"))
         .build()
     tx = txB.boxesToSpend(boxes.get())
         .outputs(newBox)

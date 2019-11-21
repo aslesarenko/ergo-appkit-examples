@@ -34,10 +34,10 @@ const txJson = ergoClient.execute(function (ctx) {
         .value(amountToPay)
         .contract(ctx.compileContract(
             ConstantsBuilder.create()
-                .item("deadline", ctx.getHeight() + newBoxDelay)
+                .item("freezeDeadline", ctx.getHeight() + newBoxDelay)
                 .item("pkOwner", prover.getP2PKAddress().pubkey())
                 .build(),
-            "{ sigmaProp(HEIGHT > deadline) && pkOwner }"))
+            "{ sigmaProp(HEIGHT > freezeDeadline) && pkOwner }"))
         .build();
     const tx = txB.boxesToSpend(boxes.get())
         .outputs(newBox)

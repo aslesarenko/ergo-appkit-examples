@@ -1,13 +1,13 @@
 const Long = Java.type("java.lang.Long")
-const RestApiErgoClient = Java.type("org.ergoplatform.example.util.RestApiErgoClient")
+const RestApiErgoClient = Java.type("org.ergoplatform.appkit.RestApiErgoClient")
 const ErgoClientException = Java.type("org.ergoplatform.appkit.ErgoClientException")
 const ConstantsBuilder = Java.type("org.ergoplatform.appkit.ConstantsBuilder")
 const ErgoContract = Java.type("org.ergoplatform.appkit.ErgoContract")
-const ErgoToolConfig = Java.type("org.ergoplatform.ergotool.ErgoToolConfig")
+const ErgoToolConfig = Java.type("org.ergoplatform.appkit.config.ErgoToolConfig")
 const Parameters = Java.type("org.ergoplatform.appkit.Parameters")
 
 const amountToPay = Long.parseLong(process.argv[2]);
-const conf = ErgoToolConfig.load("ergotool.json");
+const conf = ErgoToolConfig.load("freeze_coin_config.json");
 const nodeConf = conf.getNode();
 const ergoClient = RestApiErgoClient.create(
     nodeConf.getNodeApi().getApiUrl(),

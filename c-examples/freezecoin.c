@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <libergotool.h>
+#include <libfreezecoin.h>
 
 int main(int argc, char **argv) {
   graal_isolate_t *isolate = NULL;
@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  char * configFileName = "ergotool.json";
+  char * configFileName = "freeze_coin_config.json";
 
   // get amountToSend from cmd args and call transaction creation
   long amountToSend = atol(argv[1]);

@@ -1,14 +1,14 @@
 Long = Java.type("java.lang.Long")
 JInteger = Java.type("java.lang.Integer")  # to avoid conflict with Ruby's Integer
-RestApiErgoClient = Java.type("org.ergoplatform.example.util.RestApiErgoClient")
+RestApiErgoClient = Java.type("org.ergoplatform.appkit.RestApiErgoClient")
 ErgoClientException = Java.type("org.ergoplatform.appkit.ErgoClientException")
 ConstantsBuilder = Java.type("org.ergoplatform.appkit.ConstantsBuilder")
 ErgoContract = Java.type("org.ergoplatform.appkit.ErgoContract")
-ErgoToolConfig = Java.type("org.ergoplatform.ergotool.ErgoToolConfig")
+ErgoToolConfig = Java.type("org.ergoplatform.appkit.config.ErgoToolConfig")
 Parameters = Java.type("org.ergoplatform.appkit.Parameters")
 
 amountToPay = Long.parseLong(ARGV[0])
-conf = ErgoToolConfig.load("ergotool.json")
+conf = ErgoToolConfig.load("freeze_coin_config.json")
 newBoxSpendingDelay = JInteger.parseInt(conf.getParameters().get("newBoxSpendingDelay"))
 
 nodeConf = conf.getNode()

@@ -2,15 +2,15 @@ import sys
 import java
 
 Long = java.type("java.lang.Long")
-RestApiErgoClient = java.type("org.ergoplatform.example.util.RestApiErgoClient")
+RestApiErgoClient = java.type("org.ergoplatform.appkit.RestApiErgoClient")
 ErgoClientException = java.type("org.ergoplatform.appkit.ErgoClientException")
 ConstantsBuilder = java.type("org.ergoplatform.appkit.ConstantsBuilder")
 ErgoContract = java.type("org.ergoplatform.appkit.ErgoContract")
-ErgoToolConfig = java.type("org.ergoplatform.ergotool.ErgoToolConfig")
+ErgoToolConfig = java.type("org.ergoplatform.appkit.config.ErgoToolConfig")
 Parameters = java.type("org.ergoplatform.appkit.Parameters")
 
 amountToPay = Long.parseLong(sys.argv[1])
-conf = ErgoToolConfig.load("ergotool.json")
+conf = ErgoToolConfig.load("freeze_coin_config.json")
 nodeConf = conf.getNode()
 ergoClient = RestApiErgoClient.create(
     nodeConf.getNodeApi().getApiUrl(),

@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-public class ErgoToolJava {
+public class FreezeCoin {
 
     /**
      * Create and send transaction creating a box with the given amount using parameters from the given config file.
@@ -69,7 +69,7 @@ public class ErgoToolJava {
     public static void main(String[] args) {
         try {
             long amountToSend = Long.parseLong(args[0]);
-            String txJson = sendTx(amountToSend, "ErgoTool.json");
+            String txJson = sendTx(amountToSend, "freeze_coin_config.json");
             System.out.println(txJson);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -77,7 +77,7 @@ public class ErgoToolJava {
     }
 
     /**
-     * Entry point callable from C which wraps {@link ErgoToolJava#sendTx}
+     * Entry point callable from C which wraps {@link FreezeCoin#sendTx}
      */
     @CEntryPoint(name = "sendTx")
     public static void sendTxEntryPoint(

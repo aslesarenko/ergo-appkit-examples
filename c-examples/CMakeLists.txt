@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 11)
 add_executable(c_examples freezecoin.c)
 include_directories(".")
 LINK_DIRECTORIES("...")
-LINK_LIBRARIES(ergotool)
+LINK_LIBRARIES(freezecoin)
 
 #include(graal_isolate.h
-#        libergotool.h)
+#        libfreezecoin.h)

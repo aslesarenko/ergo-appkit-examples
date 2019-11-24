@@ -25,10 +25,10 @@ public class FreezeCoin {
      */
     public static String sendTx(long amountToSend, String configFileName) throws FileNotFoundException {
         ErgoToolConfig conf = ErgoToolConfig.load(configFileName);
-        ErgoNodeConfig nodeConf = conf.getNode();
         int newBoxSpendingDelay = Integer.parseInt(conf.getParameters().get("newBoxSpendingDelay"));
         Address ownerAddress = Address.create(conf.getParameters().get("ownerAddress"));
 
+        ErgoNodeConfig nodeConf = conf.getNode();
         ErgoClient ergoClient = RestApiErgoClient.create(nodeConf);
 
         String txJson = ergoClient.execute(ctx -> {

@@ -12,6 +12,7 @@
     "networkType": "TESTNET"
   },
   "parameters": {
-    "newBoxSpendingDelay": "30"
+    "newBoxSpendingDelay": "30",
+    "ownerAddress": "3WzR39tWQ5cxxWWX6ys7wNdJKLijPeyaKgx72uqg9FJRBCdZPovL"
   }
 }

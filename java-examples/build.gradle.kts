@@ -19,6 +19,7 @@ repositories {
 dependencies {
     testImplementation("junit", "junit", "4.12")
     implementation("org.ergoplatform", "ergo-appkit_2.12", "3.1.0", "compile")
+    implementation("org.graalvm.sdk", "graal-sdk", "19.2.1", "compile")
 }
 
 java {

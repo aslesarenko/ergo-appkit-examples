@@ -1,20 +1,19 @@
+const Integer = Java.type("java.lang.Integer")
 const Long = Java.type("java.lang.Long")
+const Address = Java.type("org.ergoplatform.appkit.Address")
 const RestApiErgoClient = Java.type("org.ergoplatform.appkit.RestApiErgoClient")
 const ErgoClientException = Java.type("org.ergoplatform.appkit.ErgoClientException")
 const ConstantsBuilder = Java.type("org.ergoplatform.appkit.ConstantsBuilder")
-const ErgoContract = Java.type("org.ergoplatform.appkit.ErgoContract")
 const ErgoToolConfig = Java.type("org.ergoplatform.appkit.config.ErgoToolConfig")
 const Parameters = Java.type("org.ergoplatform.appkit.Parameters")
 
 const amountToPay = Long.parseLong(process.argv[2]);
 const conf = ErgoToolConfig.load("freeze_coin_config.json");
 const nodeConf = conf.getNode();
-const ergoClient = RestApiErgoClient.create(
-    nodeConf.getNodeApi().getApiUrl(),
-    nodeConf.getNetworkType(),
-    nodeConf.getNodeApi().getApiKey());
+const newBoxSpendingDelay = Integer.parseInt(conf.getParameters().get("newBoxSpendingDelay"));
+const ownerAddress = Address.create(conf.getParameters().get("ownerAddress"));
 
-const newBoxDelay = 30;
+const ergoClient = RestApiErgoClient.create(nodeConf);
 
 const txJson = ergoClient.execute(function (ctx) {
     const wallet = ctx.getWallet();
@@ -34,10 +33,10 @@ const txJson = ergoClient.execute(function (ctx) {
         .value(amountToPay)
         .contract(ctx.compileContract(
             ConstantsBuilder.create()
-                .item("freezeDeadline", ctx.getHeight() + newBoxDelay)
-                .item("pkOwner", prover.getP2PKAddress().pubkey())
+                .item("freezeDeadline", ctx.getHeight() + newBoxSpendingDelay)
+                .item("ownerPk", ownerAddress.getPublicKey())
                 .build(),
-            "{ sigmaProp(HEIGHT > freezeDeadline) && pkOwner }"))
+            "{ sigmaProp(HEIGHT > freezeDeadline) && ownerPk }"))
         .build();
     const tx = txB.boxesToSpend(boxes.get())
         .outputs(newBox)

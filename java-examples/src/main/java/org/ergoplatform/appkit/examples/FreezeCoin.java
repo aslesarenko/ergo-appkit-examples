@@ -27,6 +27,7 @@ public class FreezeCoin {
         ErgoToolConfig conf = ErgoToolConfig.load(configFileName);
         ErgoNodeConfig nodeConf = conf.getNode();
         int newBoxSpendingDelay = Integer.parseInt(conf.getParameters().get("newBoxSpendingDelay"));
+        Address ownerAddress = Address.create(conf.getParameters().get("ownerAddress"));
 
         ErgoClient ergoClient = RestApiErgoClient.create(nodeConf);
 
@@ -49,9 +50,9 @@ public class FreezeCoin {
                     .contract(ctx.compileContract(
                             ConstantsBuilder.create()
                                     .item("freezeDeadline", ctx.getHeight() + newBoxSpendingDelay)
-                                    .item("walletOwnerPk", prover.getP2PKAddress().pubkey())
+                                    .item("ownerPk", ownerAddress.getPublicKey())
                                     .build(),
-                            "{ sigmaProp(HEIGHT > freezeDeadline) && walletOwnerPk }"))
+                            "{ sigmaProp(HEIGHT > freezeDeadline) && ownerPk }"))
                     .build();
             UnsignedTransaction tx = txB.boxesToSpend(boxes.get())
                     .outputs(newBox)

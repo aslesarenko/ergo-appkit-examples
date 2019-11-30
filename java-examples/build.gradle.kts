@@ -2,18 +2,19 @@ plugins {
     java
 }
 
-val ivyDir = "${System.getProperties().getProperty("user.home")}/.ivy2/local"
-
 repositories {
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://oss.sonatype.org/content/repositories/releases/")
 
-    ivy(ivyDir) {
-        layout("ivy")
-        patternLayout {
-            artifactPattern("${ivyDir}/[organisation]/[module]/[revision]/[type]s/[artifact](-[classifier])(.[ext])")
-        }
-    }
+// Uncomment this to use local Ivy repository (e.g. when ergo-appkit is published locally using `sbt publishLocal`)
+//    val ivyDir = "${System.getProperties().getProperty("user.home")}/.ivy2/local"
+//    ivy(ivyDir) {
+//        layout("ivy")
+//        patternLayout {
+//            artifactPattern("${ivyDir}/[organisation]/[module]/[revision]/[type]s/[artifact](-[classifier])(.[ext])")
+//        }
+//    }
 }
 
 dependencies {

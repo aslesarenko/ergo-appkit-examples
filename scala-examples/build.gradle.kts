@@ -1,14 +1,13 @@
 plugins {
     java
+    scala
     idea
 }
-
 idea {
     module {
-        isDownloadSources = true
+      isDownloadSources = true
     }
 }
-
 repositories {
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -25,10 +24,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation("junit", "junit", "4.12")
+    implementation("org.scala-lang:scala-library:2.12.8")
     implementation("org.ergoplatform", "ergo-appkit_2.12", "sandboxed-4c5664c8-SNAPSHOT", "compile")
-//    implementation("org.ergoplatform", "ergo-appkit_2.12", "3.1.0", "compile")
     implementation("org.graalvm.sdk", "graal-sdk", "19.2.1", "compile")
+    implementation("com.squareup.okhttp3:mockwebserver:3.12.0")
+    testImplementation("junit", "junit", "4.12")
 }
 
 java {

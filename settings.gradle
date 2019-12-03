@@ -1,3 +1,4 @@
 rootProject.name = 'appkit-examples'
 include 'java-examples'
+include 'scala-examples'
 

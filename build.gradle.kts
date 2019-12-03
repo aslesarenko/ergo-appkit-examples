@@ -4,6 +4,7 @@ plugins {
     // use `./gradlew shadowJar` to generate fat jar with java examples and all Appkit dependencies
     id("com.github.johnrengelman.shadow") version "5.2.0"
     java
+    idea
 }
 
 group = "org.ergoplatform"

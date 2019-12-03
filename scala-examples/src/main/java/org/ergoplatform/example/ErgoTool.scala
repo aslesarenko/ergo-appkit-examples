@@ -1,5 +1,6 @@
 package org.ergoplatform.example
 
+import java.io.PrintStream
 import java.util.Arrays
 
 import org.ergoplatform.appkit.{RestApiErgoClient, _}
@@ -9,89 +10,132 @@ import org.ergoplatform.appkit.JavaHelpers._
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.sandbox.Mnemonic
 
-object MnemonicApp extends App {
-  val m = Mnemonic.generateEnglishMnemonic()
-  println(m)
-}
-
 object ErgoTool {
-  val delay = 30  // 1 hour (when 1 block is mined every 2 minutes)
-  val CMD_LIST = "list"
-  val CMD_PAY = "pay"
+  val commands = Array(ListCmd, MnemonicCmd, FreezeCmd).map(c => (c.name, c)).toMap
 
   def main(args: Array[String]) = {
-    val cmdOpt = try {
-      Some(parseCmd(args))
+    val cmd = try {
+      parseCmd(args)
     }
     catch { case NonFatal(t) =>
       println(t.getMessage)
       printUsage()
-      None
+      sys.exit(1)
     }
-    cmdOpt.foreach { cmd =>
-      val ergoClient = RestApiErgoClient.create(cmd.apiUrl, cmd.networkType, cmd.apiKey)
-      cmd match {
-        case c: ListCmd =>
-          list(ergoClient, c)
-        case c: PayCmd =>
-          pay(ergoClient, c)
-      }
-    }
+    cmd.run(Console.out)
   }
 
-
   def parseCmd(args: Seq[String]): Cmd = {
-    val cmd = args(0)
-    val toolConf = ErgoToolConfig.load("ergotool.json")
-    cmd match {
-      case CMD_LIST =>
-        val limit = if (args.length > 1) args(1).toInt else 10
-        ListCmd(toolConf, cmd, limit)
-      case CMD_PAY =>
-        val amount = if (args.length > 1) args(1).toLong else sys.error(s"Payment amound is not defined")
-        PayCmd(toolConf, cmd, amount)
+    val cmdName = args(0)
+    val toolConf = ErgoToolConfig.load("freeze_coin_config.json")
+    commands.get(cmdName) match {
+      case Some(c) => c.parseCmd(args, toolConf)
       case _ =>
-        sys.error(s"Unknown command: $cmd")
+        sys.error(s"Unknown command: $cmdName")
     }
   }
 
   def printUsage() = {
+    val actions = commands.toSeq.sortBy(_._1).map { case (name, c) =>
+      s"""  ${name} ${c.cmdParamSyntax} - ${c.description}""".stripMargin
+    }.mkString("\n")
     val msg =
       s"""
-        | Usage:
-        | ergotool action [action parameters]
+        |Usage:
+        |ergotool action [action parameters]
         |
-        | Available actions:
-        |   list <limit> - list top <limit> confirmed wallet boxes
-        |   pay  <amount> - amount of NanoErg to put into the new box
+        |Available actions:
+        |$actions
      """.stripMargin
     println(msg)
   }
 
-  def list(ergoClient: ErgoClient, cmd: ListCmd) = {
-    val res = ergoClient.execute(ctx => {
-      val wallet = ctx.getWallet
-      val boxes = wallet.getUnspentBoxes(0).get().convertTo[IndexedSeq[InputBox]]
-      val lines = boxes.take(cmd.limit).map(b => b.toJson(true)).mkString("[", ",\n", "]")
-      lines
-    })
-    println(res)
+}
+
+sealed abstract class Cmd {
+  def toolConf: ErgoToolConfig
+  def name: String
+  def seed: String = toolConf.getNode.getWallet.getMnemonic
+  def password: String = toolConf.getNode.getWallet.getPassword
+  def apiUrl: String = toolConf.getNode.getNodeApi.getApiUrl
+  def apiKey: String = toolConf.getNode.getNodeApi.getApiKey
+  def networkType: NetworkType = toolConf.getNode.getNetworkType
+  def run(out: PrintStream): Unit
+}
+trait RunWithErgoClient extends Cmd {
+  override def run(out: PrintStream): Unit = {
+    val ergoClient = RestApiErgoClient.create(apiUrl, networkType, apiKey)
+    runWithClient(ergoClient, out)
   }
 
-  def pay(ergoClient: ErgoClient, cmd: PayCmd) = {
+  def runWithClient(ergoClient: ErgoClient, out: PrintStream): Unit
+}
+
+/** Base class for all Cmd factories (usually companion objects)
+  */
+sealed abstract class CmdFactory(
+      /** Command name used in command line. */
+      val name: String,
+      /** parameters syntax specification */
+      val cmdParamSyntax: String,
+      val description: String) {
+  def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd
+}
+
+case class ListCmd(toolConf: ErgoToolConfig, name: String, limit: Int) extends Cmd with RunWithErgoClient {
+  override def runWithClient(ergoClient: ErgoClient, out: PrintStream): Unit = {
+    val res: String = ergoClient.execute(ctx => {
+      val wallet = ctx.getWallet
+      val boxes = wallet.getUnspentBoxes(0).get().convertTo[IndexedSeq[InputBox]]
+      val lines = boxes.take(this.limit).map(b => b.toJson(true)).mkString("[", ",\n", "]")
+      lines
+    })
+    out.println(res)
+  }
+}
+
+object ListCmd extends CmdFactory(
+  name = "list", cmdParamSyntax = "<limit>",
+  description = "list top <limit> confirmed wallet boxes") {
+
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+    val limit = if (args.length > 1) args(1).toInt else 10
+    ListCmd(toolConf, name, limit)
+  }
+}
+
+case class MnemonicCmd(toolConf: ErgoToolConfig, name: String) extends Cmd {
+  override def run(out: PrintStream): Unit = {
+    val m = Mnemonic.generateEnglishMnemonic()
+    out.println(m)
+  }
+}
+object MnemonicCmd extends CmdFactory(
+  name = "mnemonic", cmdParamSyntax = "",
+  description = "generate new mnemonic phrase using english words and default cryptographic strength") {
+
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+    MnemonicCmd(toolConf, name)
+  }
+}
+
+case class FreezeCmd(toolConf: ErgoToolConfig, name: String, payAmount: Long) extends Cmd with RunWithErgoClient {
+
+  override def runWithClient(ergoClient: ErgoClient, out: PrintStream): Unit = {
+    val delay = toolConf.getParameters.get("newBoxSpendingDelay").toInt
     val res = ergoClient.execute(ctx => {
-      println(s"Context: ${ctx.getHeight}, ${ctx.getNetworkType}")
+      out.println(s"Context: ${ctx.getHeight}, ${ctx.getNetworkType}")
       val prover = ctx.newProverBuilder()
-          .withMnemonic(cmd.seed, cmd.password)
+          .withMnemonic(this.seed, this.password)
           .build()
-      println(s"ProverAddress: ${prover.getP2PKAddress}")
+      out.println(s"ProverAddress: ${prover.getP2PKAddress}")
       val wallet = ctx.getWallet
       val boxes = wallet.getUnspentBoxes(0).get()
       val box = boxes.get(0)
-      println(s"InputBox: ${box.toJson(true)}")
+      out.println(s"InputBox: ${box.toJson(true)}")
       val txB = ctx.newTxBuilder()
       val newBox = txB.outBoxBuilder()
-          .value(cmd.payAmount)
+          .value(this.payAmount)
           .contract(ctx.compileContract(
             ConstantsBuilder.create()
                 .item("freezeDeadline", ctx.getHeight + delay)
@@ -108,29 +152,17 @@ object ErgoTool {
       val txId = ctx.sendTransaction(signed)
       (signed.toJson(true), txId)
     })
-    println(s"SignedTransaction: ${res}")
+    out.println(s"SignedTransaction: ${res}")
   }
-
 }
+object FreezeCmd extends CmdFactory(
+  name = "freeze", cmdParamSyntax = "<amount>",
+  description = "Create a new box with given <amount> of NanoErg protectes with Freezer contract") {
 
-sealed trait Cmd {
-  def toolConf: ErgoToolConfig
-  def name: String
-  def seed: String = toolConf.getNode.getWallet.getMnemonic
-  def password: String = toolConf.getNode.getWallet.getPassword
-  def apiUrl: String = toolConf.getNode.getNodeApi.getApiUrl
-  def apiKey: String = toolConf.getNode.getNodeApi.getApiKey
-  def networkType: NetworkType = toolConf.getNode.getNetworkType
-  def run(): Unit
-}
-
-case class ListCmd(toolConf: ErgoToolConfig, name: String, limit: Int) extends Cmd {
-  override def run(): Unit = {
-
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+    val amount = if (args.length > 1) args(1).toLong else sys.error(s"Parameter <amound> is not defined")
+    FreezeCmd(toolConf, name, amount)
   }
 }
 
-case class PayCmd(toolConf: ErgoToolConfig, name: String, payAmount: Long) extends Cmd {
-  override def run(): Unit = {
-  }
-}
+

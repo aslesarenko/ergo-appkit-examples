@@ -1,14 +1,9 @@
 package org.ergoplatform.appkit.examples.ergotool
 
 import java.io.PrintStream
-import java.util.Arrays
 
 import org.ergoplatform.appkit.{RestApiErgoClient, _}
-
-import scala.util.control.NonFatal
-import org.ergoplatform.appkit.JavaHelpers._
 import org.ergoplatform.appkit.config.ErgoToolConfig
-import org.ergoplatform.appkit.sandbox.Mnemonic
 
 abstract class Cmd {
   def toolConf: ErgoToolConfig

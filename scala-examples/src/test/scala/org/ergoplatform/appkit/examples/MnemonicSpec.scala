@@ -2,7 +2,6 @@ package org.ergoplatform.appkit.examples
 
 import java.io.{ByteArrayOutputStream, PrintStream}
 
-import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.examples.ergotool.ErgoTool
 import org.scalatest.{PropSpec, Matchers}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks

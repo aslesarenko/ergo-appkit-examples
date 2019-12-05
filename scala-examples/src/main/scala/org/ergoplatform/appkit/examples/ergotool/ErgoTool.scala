@@ -1,12 +1,12 @@
 package org.ergoplatform.appkit.examples.ergotool
 
-import org.ergoplatform.appkit.config.ErgoToolConfig
-
-import scala.util.control.NonFatal
 import java.io.PrintStream
 
+import scala.util.control.NonFatal
+import org.ergoplatform.appkit.config.ErgoToolConfig
+
 object ErgoTool {
-  val commands = Array(ListCmd, MnemonicCmd, AddressCmd, FreezeCmd).map(c => (c.name, c)).toMap
+  val commands = Array(ListCmd, MnemonicCmd, AddressCmd, CheckAddressCmd, FreezeCmd).map(c => (c.name, c)).toMap
 
   def main(args: Array[String]) = {
     run(args, Console.out)

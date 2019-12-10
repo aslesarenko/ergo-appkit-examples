@@ -5,6 +5,16 @@ import java.io.PrintStream
 import scala.util.control.NonFatal
 import org.ergoplatform.appkit.config.ErgoToolConfig
 
+/**
+  * Generate native image using
+  * native-image --no-server \
+  *   -cp build/libs/appkit-examples-3.1.0-all.jar\
+  *   --report-unsupported-elements-at-runtime\
+  *   --no-fallback -H:+TraceClassInitialization -H:+ReportExceptionStackTraces\
+  *   -H:+AddAllCharsets -H:+AllowVMInspection -H:-RuntimeAssertions\
+  *   --allow-incomplete-classpath \
+  *   --enable-url-protocols=http,https org.ergoplatform.appkit.examples.ergotool.ErgoTool ergotool
+  */
 object ErgoTool {
   val commands = Array(ListCmd, MnemonicCmd, AddressCmd, CheckAddressCmd, FreezeCmd).map(c => (c.name, c)).toMap
 

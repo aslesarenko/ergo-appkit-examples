@@ -3,7 +3,7 @@ package org.ergoplatform.appkit.examples.ergotool
 import java.io.PrintStream
 
 import org.ergoplatform.appkit.config.ErgoToolConfig
-import org.ergoplatform.appkit.sandbox.Mnemonic
+import org.ergoplatform.appkit.Mnemonic
 
 case class MnemonicCmd(toolConf: ErgoToolConfig, name: String) extends Cmd {
   override def run(out: PrintStream): Unit = {

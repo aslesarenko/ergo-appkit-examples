@@ -18,7 +18,7 @@ import scala.collection.mutable.ArrayBuffer
   *   --enable-url-protocols=http,https org.ergoplatform.appkit.examples.ergotool.ErgoTool ergotool
   */
 object ErgoTool {
-  val commands: Map[String, CmdFactory] = Array(ListCmd, MnemonicCmd, AddressCmd, CheckAddressCmd, FreezeCmd).map(c => (c.name, c)).toMap
+  val commands: Map[String, CmdFactory] = Array(ListAddressBoxesCmd, MnemonicCmd, AddressCmd, CheckAddressCmd, FreezeCmd).map(c => (c.name, c)).toMap
 
   def main(args: Array[String]): Unit = {
     run(args, Console.out)
@@ -72,13 +72,17 @@ object ErgoTool {
     val actions = commands.toSeq.sortBy(_._1).map { case (name, c) =>
       s"""  $name ${c.cmdParamSyntax} - ${c.description}""".stripMargin
     }.mkString("\n")
+    val options = ErgoTool.options.sortBy(_.name).map(_.helpString).mkString("\n")
     val msg =
       s"""
         |Usage:
-        |ergotool action [action parameters]
+        |ergotool [options] action [action parameters]
         |
         |Available actions:
         |$actions
+        |
+        |Options:
+        |$options
      """.stripMargin
     out.println(msg)
   }

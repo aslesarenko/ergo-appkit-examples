@@ -5,7 +5,7 @@ import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.{ErgoClient, InputBox}
 import java.io.PrintStream
 
-case class ListCmd(toolConf: ErgoToolConfig, name: String, limit: Int) extends Cmd with RunWithErgoClient {
+case class ListWalletBoxesCmd(toolConf: ErgoToolConfig, name: String, limit: Int) extends Cmd with RunWithErgoClient {
   override def runWithClient(ergoClient: ErgoClient, out: PrintStream): Unit = {
     val res: String = ergoClient.execute(ctx => {
       val wallet = ctx.getWallet
@@ -17,12 +17,12 @@ case class ListCmd(toolConf: ErgoToolConfig, name: String, limit: Int) extends C
   }
 }
 
-object ListCmd extends CmdFactory(
-  name = "list", cmdParamSyntax = "<limit>",
-  description = "list top <limit> confirmed wallet boxes") {
+object ListWalletBoxesCmd extends CmdFactory(
+  name = "listWalletBoxes", cmdParamSyntax = "<limit>",
+  description = "list top <limit> confirmed wallet boxes which can be spent") {
 
   override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
     val limit = if (args.length > 1) args(1).toInt else 10
-    ListCmd(toolConf, name, limit)
+    ListWalletBoxesCmd(toolConf, name, limit)
   }
 }

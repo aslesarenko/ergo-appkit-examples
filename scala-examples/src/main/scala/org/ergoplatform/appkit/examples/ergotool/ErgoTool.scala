@@ -39,8 +39,7 @@ object ErgoTool {
     }
   }
 
-  val confOptionName = "--conf"
-  val options: Seq[CmdOption] = Array(ConfigOption)
+  val options: Seq[CmdOption] = Array(ConfigOption, NonInteractiveOption)
 
   def parseOptions(args: Seq[String]): (Map[String, String], Seq[String]) = {
     var resOptions = Map.empty[String, String]
@@ -49,8 +48,12 @@ object ErgoTool {
     for (o <- options) {
       val pos = resArgs.indexOf(o.cmdText)
       if (pos != -1) {
-        resOptions = resOptions + (o.name -> resArgs(pos + 1))
-        resArgs.remove(pos + 1) // remove option value
+        if (o.isFlag) {
+          resOptions = resOptions + (o.name -> "true")
+        } else {
+          resOptions = resOptions + (o.name -> resArgs(pos + 1))
+          resArgs.remove(pos + 1) // remove option value
+        }
         resArgs.remove(pos)     // remove option name
       }
     }

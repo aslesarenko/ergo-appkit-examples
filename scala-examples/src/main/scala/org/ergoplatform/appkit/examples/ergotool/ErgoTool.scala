@@ -21,7 +21,7 @@ object ErgoTool {
   val commands: Map[String, CmdFactory] = Array(
     AddressCmd, MnemonicCmd, CheckAddressCmd,
     FreezeCmd, ListWalletBoxesCmd, ListAddressBoxesCmd,
-    CreateStorageCmd, SendCmd
+    CreateStorageCmd, ExtractStorageCmd, SendCmd
     ).map(c => (c.name, c)).toMap
 
   def main(args: Array[String]): Unit = {
@@ -74,7 +74,7 @@ object ErgoTool {
 
   def printUsage(out: PrintStream): Unit = {
     val actions = commands.toSeq.sortBy(_._1).map { case (name, c) =>
-      s"""  $name ${c.cmdParamSyntax} - ${c.description}""".stripMargin
+      s"""  $name ${c.cmdParamSyntax}\n\t${c.description}""".stripMargin
     }.mkString("\n")
     val options = ErgoTool.options.sortBy(_.name).map(_.helpString).mkString("\n")
     val msg =

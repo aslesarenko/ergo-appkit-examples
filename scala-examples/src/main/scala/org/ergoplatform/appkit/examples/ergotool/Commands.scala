@@ -4,6 +4,7 @@ import java.io.PrintStream
 
 import org.ergoplatform.appkit.{RestApiErgoClient, _}
 import org.ergoplatform.appkit.config.ErgoToolConfig
+import org.ergoplatform.appkit.examples.ergotool.AddressCmd.error
 
 abstract class Cmd {
   def toolConf: ErgoToolConfig
@@ -32,9 +33,18 @@ abstract class CmdFactory(
       /** parameters syntax specification */
       val cmdParamSyntax: String,
       val description: String) {
+
   def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd
+
   def error(msg: String) = {
     sys.error(s"Error executing command `$name`: $msg")
   }
+
+  def parseNetwork(network: String): NetworkType = network match {
+    case "testnet" => NetworkType.TESTNET
+    case "mainnet" => NetworkType.MAINNET
+    case _ => error(s"Invalid network type $network")
+  }
+
 }
 

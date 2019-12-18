@@ -27,7 +27,6 @@ repositories {
 dependencies {
   // the root project doesn't have Java code, but this dependency is required for fat jar generation
   implementation(project(":java-examples"))
-  implementation(project(":scala-examples"))
 }
 
 java {

@@ -8,14 +8,14 @@ import org.ergoplatform.appkit.console.{Console => AKConsole}
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Generate native image using
-  * native-image --no-server \
-  *   -cp build/libs/appkit-examples-3.1.0-all.jar\
-  *   --report-unsupported-elements-at-runtime\
-  *   --no-fallback -H:+TraceClassInitialization -H:+ReportExceptionStackTraces\
-  *   -H:+AddAllCharsets -H:+AllowVMInspection -H:-RuntimeAssertions\
-  *   --allow-incomplete-classpath \
-  *   --enable-url-protocols=http,https org.ergoplatform.appkit.examples.ergotool.ErgoTool ergotool
+   Generate native image using
+   native-image --no-server \
+     -cp target/scala-2.12/appkit-scala-examples-3.1.0.jar\
+     --report-unsupported-elements-at-runtime\
+     --no-fallback -H:+TraceClassInitialization -H:+ReportExceptionStackTraces\
+     -H:+AddAllCharsets -H:+AllowVMInspection -H:-RuntimeAssertions\
+     --allow-incomplete-classpath \
+     --enable-url-protocols=http,https org.ergoplatform.appkit.examples.ergotool.ErgoTool ergotool
   */
 object ErgoTool {
   val commands: Map[String, CmdFactory] = Array(
@@ -65,7 +65,7 @@ object ErgoTool {
     val (cmdOptions, cmdArgs) = parseOptions(args)
     if (cmdArgs.isEmpty) sys.error(s"Please specify command name and parameters.")
 
-    val configFile = cmdOptions.getOrElse(ConfigOption.name, "freeze_coin_config.json")
+    val configFile = cmdOptions.getOrElse(ConfigOption.name, "ergo_tool_config.json")
     val toolConf = ErgoToolConfig.load(configFile)
 
     val cmdName = cmdArgs(0)

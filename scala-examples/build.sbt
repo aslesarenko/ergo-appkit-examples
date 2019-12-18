@@ -1,6 +1,8 @@
 
 lazy val allConfigDependency = "compile->compile;test->test"
 
+version := "3.1.0"
+
 libraryDependencies ++= Seq(
   "org.ergoplatform" %% "ergo-appkit" % "sandboxed-098db859-SNAPSHOT" % allConfigDependency,
   "org.graalvm.sdk" % "graal-sdk" % "19.2.1",
@@ -28,4 +30,6 @@ pomExtra in ThisBuild :=
 // these options applied only in "compile" task since scalac crashes on scaladoc compilation with "-release 8"
 // see https://github.com/scala/community-builds/issues/796#issuecomment-423395500
 scalacOptions in(Compile, compile) ++= (if (scalaBinaryVersion.value == "2.11") Seq() else Seq("-release", "8"))
+
+assemblyJarName in assembly := s"appkit-scala-examples-${version.value}.jar"
 

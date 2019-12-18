@@ -54,7 +54,7 @@ object ExtractStorageCmd extends CmdFactory(
     if (supportedKeys.contains(prop)) prop
     else propErrorMsg
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd = {
     val storageFile = if (args.length > 1) args(1) else error("storage file is not specified")
     val prop = if (args.length > 2) parsePropName(args(2)) else propErrorMsg
     val network = parseNetwork(if (args.length > 3) args(3) else error("please specify network type (mainnet|testnet)"))

@@ -16,7 +16,7 @@ object MnemonicCmd extends CmdFactory(
   name = "mnemonic", cmdParamSyntax = "",
   description = "generate new mnemonic phrase using english words and default cryptographic strength") {
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd = {
     MnemonicCmd(toolConf, name)
   }
 }

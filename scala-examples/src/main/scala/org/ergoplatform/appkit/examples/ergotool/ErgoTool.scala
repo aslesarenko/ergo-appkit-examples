@@ -30,7 +30,7 @@ object ErgoTool {
 
   def run(args: Seq[String], out: PrintStream): Unit = {
     try {
-      val cmd = parseCmd(args)
+      val cmd = parseCmd(args, out)
       cmd.run(out)
     }
     catch { case NonFatal(t) =>
@@ -60,7 +60,7 @@ object ErgoTool {
     (resOptions, resArgs)
   }
 
-  def parseCmd(args: Seq[String]): Cmd = {
+  def parseCmd(args: Seq[String], out: PrintStream): Cmd = {
     val (cmdOptions, cmdArgs) = parseOptions(args)
     if (cmdArgs.isEmpty) sys.error(s"Please specify command name and parameters.")
 
@@ -69,7 +69,7 @@ object ErgoTool {
 
     val cmdName = cmdArgs(0)
     commands.get(cmdName) match {
-      case Some(c) => c.parseCmd(cmdArgs, toolConf)
+      case Some(c) => c.parseCmd(cmdArgs, toolConf, out)
       case _ =>
         sys.error(s"Unknown command: $cmdName")
     }

@@ -1,21 +1,29 @@
 package org.ergoplatform.appkit.examples.ergotool
 
 import java.io.PrintStream
-
+import java.util.Arrays
 import org.ergoplatform.appkit.{RestApiErgoClient, _}
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.examples.ergotool.AddressCmd.error
 
 abstract class Cmd {
   def toolConf: ErgoToolConfig
+
   def name: String
+
   def seed: String = toolConf.getNode.getWallet.getMnemonic
+
   def password: String = toolConf.getNode.getWallet.getPassword
+
   def apiUrl: String = toolConf.getNode.getNodeApi.getApiUrl
+
   def apiKey: String = toolConf.getNode.getNodeApi.getApiKey
+
   def networkType: NetworkType = toolConf.getNode.getNetworkType
+
   def run(out: PrintStream): Unit
 }
+
 trait RunWithErgoClient extends Cmd {
   override def run(out: PrintStream): Unit = {
     val ergoClient = RestApiErgoClient.create(apiUrl, networkType, apiKey)
@@ -26,15 +34,15 @@ trait RunWithErgoClient extends Cmd {
 }
 
 /** Base class for all Cmd factories (usually companion objects)
-  */
+ */
 abstract class CmdFactory(
-      /** Command name used in command line. */
-      val name: String,
-      /** parameters syntax specification */
-      val cmdParamSyntax: String,
-      val description: String) {
+                             /** Command name used in command line. */
+                             val name: String,
 
-  def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd
+                             /** parameters syntax specification */
+                             val cmdParamSyntax: String,
+                             val description: String) {
+  def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd
 
   def error(msg: String) = {
     sys.error(s"Error executing command `$name`: $msg")
@@ -46,5 +54,32 @@ abstract class CmdFactory(
     case _ => error(s"Invalid network type $network")
   }
 
+  /** Secure entry of the new password.
+   *
+   * @param nAttemps number of attempts
+   * @param block  code block which can request the user to enter a new password twice
+   * @return password returned by `block`
+   */
+  def readNewPassword(nAttemps: Int, out: PrintStream)(block: => (Array[Char], Array[Char])): Array[Char] = {
+    var i = 0
+    do {
+      val (p1, p2) = block
+      i += 1
+      if (Arrays.equals(p1, p2)) {
+        Arrays.fill(p2, ' ') // cleanup duplicate copy
+        return p1
+      }
+      else {
+        Arrays.fill(p1, ' ') // cleanup sensitive data
+        Arrays.fill(p2, ' ')
+        if (i < nAttemps) {
+          out.println(s"Passwords are different, try again [${i + 1}/$nAttemps]")
+          // and loop
+        } else
+          error(s"Cannot continue without providing valid password")
+      }
+    } while (true)
+    error("should never go here due to exhaustive `if` above")
+  }
 }
 

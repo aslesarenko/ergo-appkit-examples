@@ -19,7 +19,7 @@ object ListAddressBoxesCmd extends CmdFactory(
   name = "listAddressBoxes", cmdParamSyntax = "address [<limit>=10]",
   description = "list top <limit=10> confirmed unspent boxes owned by the given <address>") {
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd = {
     val address = if (args.length > 1) args(1) else error(s"address is not specified")
     val limit = if (args.length > 2) args(2).toInt else 10
     ListAddressBoxesCmd(toolConf, name, address, limit)

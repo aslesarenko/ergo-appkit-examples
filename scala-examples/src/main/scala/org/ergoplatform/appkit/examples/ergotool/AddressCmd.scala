@@ -18,7 +18,7 @@ object AddressCmd extends CmdFactory(
   name = "address", cmdParamSyntax = "testnet|mainnet <mnemonic>",
   description = "return address for a given mnemonic and password pair") {
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd = {
     val network = if (args.length > 1) args(1) else error("network is not specified (mainnet or testnet)")
     val networkType = parseNetwork(network)
     val mnemonic = if (args.length > 2) args(2) else error("mnemonic is not specified")

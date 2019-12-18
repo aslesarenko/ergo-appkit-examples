@@ -17,7 +17,7 @@ object CheckAddressCmd extends CmdFactory(
   name = "checkAddress", cmdParamSyntax = "testnet|mainnet <mnemonic> <mnemonic password> <address>",
   description = "Check the given mnemonic and password pair correspond to the given address") {
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd = {
     if (args.length < 5) error("not enough parameters")
     val network = args(1)
     val networkType = network match {

@@ -21,7 +21,7 @@ object ListWalletBoxesCmd extends CmdFactory(
   name = "listWalletBoxes", cmdParamSyntax = "<limit>",
   description = "list top <limit> confirmed wallet boxes which can be spent") {
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig): Cmd = {
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd = {
     val limit = if (args.length > 1) args(1).toInt else 10
     ListWalletBoxesCmd(toolConf, name, limit)
   }

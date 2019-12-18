@@ -2,6 +2,7 @@ package org.ergoplatform.appkit.examples
 
 import java.io.{StringReader, ByteArrayOutputStream, BufferedReader, PrintStream}
 
+import org.ergoplatform.appkit.console.{Console, ConsoleImpl}
 import org.scalatest.Matchers
 
 trait ConsoleTesting { self: Matchers =>
@@ -15,9 +16,11 @@ trait ConsoleTesting { self: Matchers =>
 
   case class WriteRead(write: String, read: String)
   case class ConsoleScenario(operations: Seq[WriteRead]) {
+    /** Text passed to the input stream of the console */
     def getReadText: String = {
       operations.map(i => s"${i.read}\n").mkString("")
     }
+    /** Text printed to the output stream of the console */
     def getWriteText: String = {
       operations.map(i => i.write).mkString("")
     }
@@ -47,14 +50,18 @@ trait ConsoleTesting { self: Matchers =>
     ConsoleScenario(operations)
   }
 
-  def testScenario(scenario: ConsoleScenario)(action: Console => Unit) = {
+  /** Runs the scenario and returns the printed output text. */
+  def runScenario(scenario: ConsoleScenario)(action: Console => Unit): String = {
     val (console, out) = prepareConsole(scenario.getReadText)
-
     action(console)
-
-    val output = scenario.getWriteText
-    output shouldBe out.toString()
+    out.toString()
   }
 
+  /** Runs the scenario and checks the actual output text against expected in the scenario. */
+  def testScenario(scenario: ConsoleScenario)(action: Console => Unit) = {
+    val res = runScenario(scenario)(action)
+    val output = scenario.getWriteText
+    output shouldBe res
+  }
 
 }

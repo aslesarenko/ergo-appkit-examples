@@ -4,6 +4,7 @@ import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.{NetworkType, SecretStorage}
 import java.io.PrintStream
 
+import org.ergoplatform.appkit.console.Console
 import org.ergoplatform.wallet.secrets.ExtendedSecretKeySerializer
 import scorex.util.encode.Base16
 
@@ -11,23 +12,23 @@ case class ExtractStorageCmd(
     toolConf: ErgoToolConfig, name: String,
     storageFile: String, storagePass: Array[Char], prop: String, network: NetworkType) extends Cmd {
   import ExtractStorageCmd._
-  override def run(out: PrintStream): Unit = {
+  override def run(console: Console): Unit = {
     val storage = SecretStorage.loadFrom(storageFile)
     storage.unlock(String.valueOf(storagePass))
     val secret = storage.getSecret
     prop match {
       case PropAddress =>
-        out.println(storage.getAddressFor(network).toString)
+        console.println(storage.getAddressFor(network).toString)
       case PropMasterKey =>
         val secretStr = Base16.encode(ExtendedSecretKeySerializer.toBytes(secret))
-        out.println(secretStr)
+        console.println(secretStr)
       case PropSecretKey =>
         val sk  = Base16.encode(secret.keyBytes)
         assert(sk == secret.key.w.toString(16), "inconsistent secret")
-        out.println(sk)
+        console.println(sk)
       case PropPublicKey =>
         val pk = Base16.encode(secret.key.publicImage.pkBytes)
-        out.println(pk)
+        console.println(pk)
       case _ =>
         sys.error(s"Invalid property requested: $prop")
     }
@@ -54,7 +55,7 @@ object ExtractStorageCmd extends CmdFactory(
     if (supportedKeys.contains(prop)) prop
     else propErrorMsg
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd = {
+  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, console: Console): Cmd = {
     val storageFile = if (args.length > 1) args(1) else error("storage file is not specified")
     val prop = if (args.length > 2) parsePropName(args(2)) else propErrorMsg
     val network = parseNetwork(if (args.length > 3) args(3) else error("please specify network type (mainnet|testnet)"))

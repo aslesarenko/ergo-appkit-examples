@@ -4,7 +4,7 @@ import java.io.PrintStream
 
 import scala.util.control.NonFatal
 import org.ergoplatform.appkit.config.ErgoToolConfig
-
+import org.ergoplatform.appkit.console.{Console => AKConsole}
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -25,17 +25,18 @@ object ErgoTool {
     ).map(c => (c.name, c)).toMap
 
   def main(args: Array[String]): Unit = {
-    run(args, Console.out)
+    val console = AKConsole.instance()
+    run(args, console)
   }
 
-  def run(args: Seq[String], out: PrintStream): Unit = {
+  def run(args: Seq[String], console: AKConsole): Unit = {
     try {
-      val cmd = parseCmd(args, out)
-      cmd.run(out)
+      val cmd = parseCmd(args, console)
+      cmd.run(console)
     }
     catch { case NonFatal(t) =>
-      out.println(t.getMessage)
-      printUsage(out)
+      console.println(t.getMessage)
+      printUsage(console)
     }
   }
 
@@ -60,7 +61,7 @@ object ErgoTool {
     (resOptions, resArgs)
   }
 
-  def parseCmd(args: Seq[String], out: PrintStream): Cmd = {
+  def parseCmd(args: Seq[String], console: AKConsole): Cmd = {
     val (cmdOptions, cmdArgs) = parseOptions(args)
     if (cmdArgs.isEmpty) sys.error(s"Please specify command name and parameters.")
 
@@ -69,13 +70,13 @@ object ErgoTool {
 
     val cmdName = cmdArgs(0)
     commands.get(cmdName) match {
-      case Some(c) => c.parseCmd(cmdArgs, toolConf, out)
+      case Some(c) => c.parseCmd(cmdArgs, toolConf, console)
       case _ =>
         sys.error(s"Unknown command: $cmdName")
     }
   }
 
-  def printUsage(out: PrintStream): Unit = {
+  def printUsage(console: AKConsole): Unit = {
     val actions = commands.toSeq.sortBy(_._1).map { case (name, c) =>
       s"""  $name ${c.cmdParamSyntax}\n\t${c.description}""".stripMargin
     }.mkString("\n")
@@ -91,7 +92,7 @@ object ErgoTool {
         |Options:
         |$options
      """.stripMargin
-    out.println(msg)
+    console.println(msg)
   }
 
 }

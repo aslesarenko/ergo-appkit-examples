@@ -1,10 +1,10 @@
 package org.ergoplatform.appkit.examples.ergotool
 
-import java.io.PrintStream
 import java.util.Arrays
+
 import org.ergoplatform.appkit.{RestApiErgoClient, _}
 import org.ergoplatform.appkit.config.ErgoToolConfig
-import org.ergoplatform.appkit.examples.ergotool.AddressCmd.error
+import org.ergoplatform.appkit.console.Console
 
 abstract class Cmd {
   def toolConf: ErgoToolConfig
@@ -21,16 +21,16 @@ abstract class Cmd {
 
   def networkType: NetworkType = toolConf.getNode.getNetworkType
 
-  def run(out: PrintStream): Unit
+  def run(console: Console): Unit
 }
 
 trait RunWithErgoClient extends Cmd {
-  override def run(out: PrintStream): Unit = {
+  override def run(console: Console): Unit = {
     val ergoClient = RestApiErgoClient.create(apiUrl, networkType, apiKey)
-    runWithClient(ergoClient, out)
+    runWithClient(ergoClient, console)
   }
 
-  def runWithClient(ergoClient: ErgoClient, out: PrintStream): Unit
+  def runWithClient(ergoClient: ErgoClient, console: Console): Unit
 }
 
 /** Base class for all Cmd factories (usually companion objects)
@@ -42,7 +42,7 @@ abstract class CmdFactory(
                              /** parameters syntax specification */
                              val cmdParamSyntax: String,
                              val description: String) {
-  def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, out: PrintStream): Cmd
+  def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, console: Console): Cmd
 
   def error(msg: String) = {
     sys.error(s"Error executing command `$name`: $msg")
@@ -60,7 +60,7 @@ abstract class CmdFactory(
    * @param block  code block which can request the user to enter a new password twice
    * @return password returned by `block`
    */
-  def readNewPassword(nAttemps: Int, out: PrintStream)(block: => (Array[Char], Array[Char])): Array[Char] = {
+  def readNewPassword(nAttemps: Int, console: Console)(block: => (Array[Char], Array[Char])): Array[Char] = {
     var i = 0
     do {
       val (p1, p2) = block
@@ -73,7 +73,7 @@ abstract class CmdFactory(
         Arrays.fill(p1, ' ') // cleanup sensitive data
         Arrays.fill(p2, ' ')
         if (i < nAttemps) {
-          out.println(s"Passwords are different, try again [${i + 1}/$nAttemps]")
+          console.println(s"Passwords are different, try again [${i + 1}/$nAttemps]")
           // and loop
         } else
           error(s"Cannot continue without providing valid password")

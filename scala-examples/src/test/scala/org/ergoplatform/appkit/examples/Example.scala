@@ -2,6 +2,8 @@ package org.ergoplatform.appkit.examples
 
 import java.io.{InputStreamReader, BufferedReader, PrintStream}
 
+import org.ergoplatform.appkit.console.{Console, ConsoleImpl}
+
 object Example {
   def main(args: Array[String]): Unit = {
     val in = new BufferedReader(new InputStreamReader(System.in))

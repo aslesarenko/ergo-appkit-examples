@@ -1,14 +1,21 @@
-package org.ergoplatform.appkit.examples
+package org.ergoplatform.appkit.console
 
-import java.io.{PrintStream, BufferedReader}
+import java.io.{InputStreamReader, BufferedReader, PrintStream}
 
 abstract class Console {
   def print(s: String): Console
   def println(s: String): Console
   def readLine(): String
-  def readLine(msg: String): String
+  def readLine(prompt: String): String
   def readPassword(): Array[Char]
-  def readPassword(msg: String): Array[Char]
+  def readPassword(prompt: String): Array[Char]
+}
+object Console {
+  def instance(): Console = {
+    val in = new BufferedReader(new InputStreamReader(System.in))
+    val out = new PrintStream(System.out)
+    new ConsoleImpl(in, out)
+  }
 }
 
 class ConsoleImpl(in: BufferedReader, out: PrintStream) extends Console {
@@ -22,6 +29,7 @@ class ConsoleImpl(in: BufferedReader, out: PrintStream) extends Console {
     print(msg).readLine()
   }
 
+  // TODO security: these methods should be reimplemented without using String (See java.io.Console)
   override def readPassword(): Array[Char] = {
     val line = readLine()
     line.toCharArray

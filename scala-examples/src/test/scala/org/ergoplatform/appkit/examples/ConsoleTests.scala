@@ -4,31 +4,33 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.{PropSpec, Matchers}
 
 class ConsoleTests extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks with ConsoleTesting {
-  val line1 = "input line 1"
-  val line2 = "input line 2"
   val scenario = ConsoleScenario(Seq(
-    RequestResponse("Enter line 1> ", "input line 1"),
-    RequestResponse("Enter line 2> ", "input line 2")
+    WriteRead("Enter line 1> ", "input line 1"),
+    WriteRead("Enter line 2> ", "input line 2"),
+    WriteRead("You entered: input line 1input line 2\n", ""),
   ))
 
-  def expectedOutput(scenario: ConsoleScenario): String = {
-    val line1 = scenario.interactions(0)
-    val line2 = scenario.interactions(1)
-    line1.request + line2.request +
-        s"You entered: ${line1.response + line2.response}\n"
-  }
-
   property("read input string") {
-    val (console, out) = prepareConsole(scenario.getResponseText)
-    Example.process(console)
-
-    val output = expectedOutput(scenario)
-
-    output shouldBe out.toString()
+    testScenario(scenario) { console =>
+      Example.process(console)
+    }
   }
 
-  property("read input from file") {
+  property("parse scenario from text") {
+    val text =
+      s"""# first line comment (should be ignored)
+       |Enter line 1> ::input line 1;
+       |# second line comment
+       |Enter line 2> ::input line 2;
+       |You entered: input line 1input line 2${'\n'}::;
+       |""".stripMargin
 
+     val parsed = parseScenario(text)
+     parsed shouldBe scenario
+
+    testScenario(parsed) { console =>
+      Example.process(console)
+    }
   }
 }
 

@@ -73,5 +73,14 @@ class ErgoToolSpec extends PropSpec with Matchers with ScalaCheckDrivenPropertyC
     res.contains("Network type of the address MAINNET don't match expected TESTNET") shouldBe true
   }
 
+  ignore("send command") {
+    val res = runCommand(
+      s"""Storage password> ::abc;
+        |""".stripMargin,
+      "send", "storage/E1.json", "9hHDQb26AjnJUXxcqriqY1mnhpLuUeC81C4pggtK7tupr92Ea1K", "1000000")
+    println(res)
+  }
+
+
 }
 

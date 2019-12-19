@@ -1,17 +1,25 @@
+lazy val sonatypePublic = "Sonatype Public" at "https://oss.sonatype.org/content/groups/public/"
+lazy val sonatypeReleases = "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+lazy val sonatypeSnapshots = "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
-lazy val allConfigDependency = "compile->compile;test->test"
+resolvers ++= Seq(sonatypeReleases, sonatypeSnapshots, Resolver.mavenCentral)
+
+//lazy val allConfigDependency = "compile->compile;test->test"
 
 version := "3.1.0"
+val appkit = "org.ergoplatform" %% "ergo-appkit" % "sandboxed-18e15e59-SNAPSHOT"
 
 libraryDependencies ++= Seq(
-  "org.ergoplatform" %% "ergo-appkit" % "sandboxed-098db859-SNAPSHOT" % allConfigDependency,
+  appkit, (appkit % Test).classifier("tests"),
   "org.graalvm.sdk" % "graal-sdk" % "19.2.1",
   "com.squareup.okhttp3" % "mockwebserver" % "3.12.0",
 
   "org.scalatest" %% "scalatest" % "3.0.8" % "test",
   "org.scalacheck" %% "scalacheck" % "1.14.1" % "test"
 )
-
+libraryDependencies in Test ++= Seq(
+  "org.ergoplatform" %% "ergo-appkit" % "sandboxed-18e15e59-SNAPSHOT" % "test->test",
+)
 publishMavenStyle in ThisBuild := true
 
 publishArtifact in Test := false

@@ -3,19 +3,16 @@ package org.ergoplatform.appkit.examples.ergotool
 import org.ergoplatform.appkit.JavaHelpers._
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.{ErgoClient, Address, InputBox}
-import java.io.PrintStream
-
-import org.ergoplatform.appkit.console.Console
 import org.ergoplatform.appkit.examples.ergotool.ErgoTool.RunContext
 
 case class ListAddressBoxesCmd(toolConf: ErgoToolConfig, name: String, address: String, limit: Int) extends Cmd with RunWithErgoClient {
-  override def runWithClient(ergoClient: ErgoClient, console: Console): Unit = {
+  override def runWithClient(ergoClient: ErgoClient, runCtx: RunContext): Unit = {
     val res: String = ergoClient.execute(ctx => {
       val boxes = ctx.getUnspentBoxesFor(Address.create(address)).convertTo[IndexedSeq[InputBox]]
       val lines = boxes.take(this.limit).map(b => b.toJson(true)).mkString("[", ",\n", "]")
       lines
     })
-    console.print(res)
+    runCtx.console.print(res)
   }
 }
 object ListAddressBoxesCmd extends CmdFactory(

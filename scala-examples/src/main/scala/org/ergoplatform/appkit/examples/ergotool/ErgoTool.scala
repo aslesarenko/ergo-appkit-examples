@@ -1,8 +1,11 @@
 package org.ergoplatform.appkit.examples.ergotool
 
+import org.ergoplatform.appkit.{ErgoClient, RestApiErgoClient, NetworkType}
+
 import scala.util.control.NonFatal
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.console.Console
+
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -24,7 +27,9 @@ object ErgoTool {
 
   def main(args: Array[String]): Unit = {
     val console = Console.instance()
-    run(args, console)
+    run(args, console, { ctx =>
+      RestApiErgoClient.create(ctx.apiUrl, ctx.networkType, ctx.apiKey)
+    })
   }
 
   case class RunContext(
@@ -37,15 +42,23 @@ object ErgoTool {
     /** Command args parsed from command line */
     cmdArgs: Seq[String],
     /** Tool configuration read from the file (either default or specified by --conf option */
-    toolConf: ErgoToolConfig
-    )
+    toolConf: ErgoToolConfig,
+    /** Factory method which is used to create ErgoClient instance if and when it is needed */
+    clientFactory: RunContext => ErgoClient
+    ) {
+    def apiUrl: String = toolConf.getNode.getNodeApi.getApiUrl
 
-  def run(args: Seq[String], console: Console): Unit = {
+    def apiKey: String = toolConf.getNode.getNodeApi.getApiKey
+
+    def networkType: NetworkType = toolConf.getNode.getNetworkType
+  }
+
+  def run(args: Seq[String], console: Console, clientFactory: RunContext => ErgoClient): Unit = {
     try {
       val (cmdOptions, cmdArgs) = parseOptions(args)
       if (cmdArgs.isEmpty) sys.error(s"Please specify command name and parameters.")
       val toolConf = loadConfig(cmdOptions)
-      val ctx = RunContext(args, console, cmdOptions, cmdArgs, toolConf)
+      val ctx = RunContext(args, console, cmdOptions, cmdArgs, toolConf, clientFactory)
       val cmd = parseCmd(ctx)
       cmd.run(ctx)
     }

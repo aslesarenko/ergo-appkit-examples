@@ -27,11 +27,11 @@ abstract class Cmd {
 
 trait RunWithErgoClient extends Cmd {
   override def run(ctx: RunContext): Unit = {
-    val ergoClient = RestApiErgoClient.create(apiUrl, networkType, apiKey)
-    runWithClient(ergoClient, ctx.console)
+    val ergoClient = ctx.clientFactory(ctx)
+    runWithClient(ergoClient, ctx)
   }
 
-  def runWithClient(ergoClient: ErgoClient, console: Console): Unit
+  def runWithClient(ergoClient: ErgoClient, ctx: RunContext): Unit
 }
 
 /** Base class for all Cmd factories (usually companion objects)

@@ -11,7 +11,8 @@ import org.ergoplatform.appkit.examples.ergotool.ErgoTool.RunContext
 
 case class FreezeCmd(toolConf: ErgoToolConfig, name: String, payAmount: Long) extends Cmd with RunWithErgoClient {
 
-  override def runWithClient(ergoClient: ErgoClient, console: Console): Unit = {
+  override def runWithClient(ergoClient: ErgoClient, runCtx: RunContext): Unit = {
+    val console = runCtx.console
     val delay = toolConf.getParameters.get("newBoxSpendingDelay").toInt
     val res = ergoClient.execute(ctx => {
       console.println(s"Context: ${ctx.getHeight}, ${ctx.getNetworkType}")

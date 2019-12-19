@@ -17,7 +17,8 @@ case class SendCmd(toolConf: ErgoToolConfig, name: String, storageFile: File, st
     res
   }
 
-  override def runWithClient(ergoClient: ErgoClient, console: Console): Unit = {
+  override def runWithClient(ergoClient: ErgoClient, runCtx: RunContext): Unit = {
+    val console = runCtx.console
     val res: String = ergoClient.execute(ctx => {
       val senderProver = loggedStep("Creating prover", console) {
         BoxOperations.createProver(ctx, storageFile.getPath, String.valueOf(storagePass))

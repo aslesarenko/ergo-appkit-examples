@@ -5,6 +5,7 @@ import java.util.Arrays
 import org.ergoplatform.appkit.{RestApiErgoClient, _}
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.console.Console
+import org.ergoplatform.appkit.examples.ergotool.ErgoTool.RunContext
 
 abstract class Cmd {
   def toolConf: ErgoToolConfig
@@ -21,13 +22,13 @@ abstract class Cmd {
 
   def networkType: NetworkType = toolConf.getNode.getNetworkType
 
-  def run(console: Console): Unit
+  def run(ctx: RunContext): Unit
 }
 
 trait RunWithErgoClient extends Cmd {
-  override def run(console: Console): Unit = {
+  override def run(ctx: RunContext): Unit = {
     val ergoClient = RestApiErgoClient.create(apiUrl, networkType, apiKey)
-    runWithClient(ergoClient, console)
+    runWithClient(ergoClient, ctx.console)
   }
 
   def runWithClient(ergoClient: ErgoClient, console: Console): Unit
@@ -42,7 +43,7 @@ abstract class CmdFactory(
                              /** parameters syntax specification */
                              val cmdParamSyntax: String,
                              val description: String) {
-  def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, console: Console): Cmd
+  def parseCmd(ctx: RunContext): Cmd
 
   def error(msg: String) = {
     sys.error(s"Error executing command `$name`: $msg")

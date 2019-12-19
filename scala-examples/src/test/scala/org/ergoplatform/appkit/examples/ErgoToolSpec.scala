@@ -9,6 +9,9 @@ class ErgoToolSpec extends PropSpec with Matchers with ScalaCheckDrivenPropertyC
   val addrStr = "3WzR39tWQ5cxxWWX6ys7wNdJKLijPeyaKgx72uqg9FJRBCdZPovL"
   val mnemonic = "slow silly start wash bundle suffer bulb ancient height spin express remind today effort helmet"
 
+  val addr2Str = "3WwWU3GJLK3aXCsoqptRboPYnvdqwv9QMBbpHybwXdVo9bSaMLEE"
+  val mnemonic2 = "burst cancel left report gauge fame fit slow series dial convince satoshi outer magnet filter"
+
   /** @param name command name
    * @param consoleOps input and output operations with the console
    * @param args arguments of command line
@@ -71,6 +74,14 @@ class ErgoToolSpec extends PropSpec with Matchers with ScalaCheckDrivenPropertyC
         |""".stripMargin,
       "checkAddress", "testnet", mnemonic, "9f4QF8AD1nQ3nJahQVkMj8hFSVVzVom77b52JU7EW71Zexg6N8v")
     res.contains("Network type of the address MAINNET don't match expected TESTNET") shouldBe true
+  }
+
+  property("send command (dry run)") {
+    val res = runCommand(
+      s"""Storage password> ::abc;
+        |""".stripMargin,
+      "send", "storage/addr.json", "3WwWU3GJLK3aXCsoqptRboPYnvdqwv9QMBbpHybwXdVo9bSaMLEE", "1000000")
+    println(res)
   }
 
   ignore("send command") {

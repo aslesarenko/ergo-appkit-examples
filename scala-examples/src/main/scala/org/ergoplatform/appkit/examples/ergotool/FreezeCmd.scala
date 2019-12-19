@@ -7,6 +7,7 @@ import org.ergoplatform.appkit.{ErgoClient, Parameters, ConstantsBuilder}
 import java.util.Arrays
 
 import org.ergoplatform.appkit.console.Console
+import org.ergoplatform.appkit.examples.ergotool.ErgoTool.RunContext
 
 case class FreezeCmd(toolConf: ErgoToolConfig, name: String, payAmount: Long) extends Cmd with RunWithErgoClient {
 
@@ -49,8 +50,9 @@ object FreezeCmd extends CmdFactory(
   name = "freeze", cmdParamSyntax = "<amount>",
   description = "Create a new box with given <amount> of NanoErg protectes with Freezer contract") {
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, console: Console): Cmd = {
+  override def parseCmd(ctx: RunContext): Cmd = {
+    val args = ctx.cmdArgs
     val amount = if (args.length > 1) args(1).toLong else sys.error(s"Parameter <amound> is not defined")
-    FreezeCmd(toolConf, name, amount)
+    FreezeCmd(ctx.toolConf, name, amount)
   }
 }

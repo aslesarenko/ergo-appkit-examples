@@ -6,20 +6,23 @@ import java.io.PrintStream
 import java.util
 
 import org.ergoplatform.appkit.console.Console
+import org.ergoplatform.appkit.examples.ergotool.ErgoTool.RunContext
 
 case class CreateStorageCmd(toolConf: ErgoToolConfig, name: String, mnemonic: Mnemonic, storagePass: Array[Char]) extends Cmd {
-  override def run(console: Console): Unit = {
+  override def run(ctx: RunContext): Unit = {
     val storage = SecretStorage.createFromMnemonicIn("storage", mnemonic, String.valueOf(storagePass))
     util.Arrays.fill(storagePass, 0.asInstanceOf[Char])
     val filePath = storage.getFile.getPath
-    console.println(s"Storage File: $filePath")
+    ctx.console.println(s"Storage File: $filePath")
   }
 }
 object CreateStorageCmd extends CmdFactory(
   name = "createStorage", cmdParamSyntax = "<mnemonic>",
   description = "Creates an encrypted storage file for the given <mnemonic> (requests storage password)") {
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, console: Console): Cmd = {
+  override def parseCmd(ctx: RunContext): Cmd = {
+    val args = ctx.cmdArgs
+    val console = ctx.console
     val phrase = if (args.length > 1) args(1) else error("mnemonic is not specified")
 
     val mnemonicPass = readNewPassword(3, console) {
@@ -33,7 +36,7 @@ object CreateStorageCmd extends CmdFactory(
       val p2 = console.readPassword("Repeat storage password> ")
       (p1, p2)
     }
-    CreateStorageCmd(toolConf, name, recipient, storagePass)
+    CreateStorageCmd(ctx.toolConf, name, recipient, storagePass)
   }
 }
 

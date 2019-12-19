@@ -5,6 +5,7 @@ import org.ergoplatform.appkit.{NetworkType, SecretStorage}
 import java.io.PrintStream
 
 import org.ergoplatform.appkit.console.Console
+import org.ergoplatform.appkit.examples.ergotool.ErgoTool.RunContext
 import org.ergoplatform.wallet.secrets.ExtendedSecretKeySerializer
 import scorex.util.encode.Base16
 
@@ -12,7 +13,8 @@ case class ExtractStorageCmd(
     toolConf: ErgoToolConfig, name: String,
     storageFile: String, storagePass: Array[Char], prop: String, network: NetworkType) extends Cmd {
   import ExtractStorageCmd._
-  override def run(console: Console): Unit = {
+  override def run(ctx: RunContext): Unit = {
+    val console = ctx.console
     val storage = SecretStorage.loadFrom(storageFile)
     storage.unlock(String.valueOf(storagePass))
     val secret = storage.getSecret
@@ -55,13 +57,13 @@ object ExtractStorageCmd extends CmdFactory(
     if (supportedKeys.contains(prop)) prop
     else propErrorMsg
 
-  override def parseCmd(args: Seq[String], toolConf: ErgoToolConfig, console: Console): Cmd = {
+  override def parseCmd(ctx: RunContext): Cmd = {
+    val args = ctx.cmdArgs
     val storageFile = if (args.length > 1) args(1) else error("storage file is not specified")
     val prop = if (args.length > 2) parsePropName(args(2)) else propErrorMsg
     val network = parseNetwork(if (args.length > 3) args(3) else error("please specify network type (mainnet|testnet)"))
-    val console = System.console()
-    val storagePass = console.readPassword("Storage password> ")
-    ExtractStorageCmd(toolConf, name, storageFile, storagePass, prop, network)
+    val storagePass = ctx.console.readPassword("Storage password> ")
+    ExtractStorageCmd(ctx.toolConf, name, storageFile, storagePass, prop, network)
   }
 }
 

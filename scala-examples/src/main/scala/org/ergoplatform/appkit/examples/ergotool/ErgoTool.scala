@@ -1,10 +1,8 @@
 package org.ergoplatform.appkit.examples.ergotool
 
-import java.io.PrintStream
-
 import scala.util.control.NonFatal
 import org.ergoplatform.appkit.config.ErgoToolConfig
-import org.ergoplatform.appkit.console.{Console => AKConsole}
+import org.ergoplatform.appkit.console.Console
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -25,14 +23,31 @@ object ErgoTool {
     ).map(c => (c.name, c)).toMap
 
   def main(args: Array[String]): Unit = {
-    val console = AKConsole.instance()
+    val console = Console.instance()
     run(args, console)
   }
 
-  def run(args: Seq[String], console: AKConsole): Unit = {
+  case class RunContext(
+    /** Arguments of command line passed to ErgoTool.main */
+    commandLineArgs: Seq[String],
+    /** Console interface to be used during command execution */
+    console: Console,
+    /** Options parsed from command line */
+    cmdOptions: Map[String, String],
+    /** Command args parsed from command line */
+    cmdArgs: Seq[String],
+    /** Tool configuration read from the file (either default or specified by --conf option */
+    toolConf: ErgoToolConfig
+    )
+
+  def run(args: Seq[String], console: Console): Unit = {
     try {
-      val cmd = parseCmd(args, console)
-      cmd.run(console)
+      val (cmdOptions, cmdArgs) = parseOptions(args)
+      if (cmdArgs.isEmpty) sys.error(s"Please specify command name and parameters.")
+      val toolConf = loadConfig(cmdOptions)
+      val ctx = RunContext(args, console, cmdOptions, cmdArgs, toolConf)
+      val cmd = parseCmd(ctx)
+      cmd.run(ctx)
     }
     catch { case NonFatal(t) =>
       console.println(t.getMessage)
@@ -61,22 +76,22 @@ object ErgoTool {
     (resOptions, resArgs)
   }
 
-  def parseCmd(args: Seq[String], console: AKConsole): Cmd = {
-    val (cmdOptions, cmdArgs) = parseOptions(args)
-    if (cmdArgs.isEmpty) sys.error(s"Please specify command name and parameters.")
-
+  def loadConfig(cmdOptions: Map[String, String]): ErgoToolConfig = {
     val configFile = cmdOptions.getOrElse(ConfigOption.name, "ergo_tool_config.json")
     val toolConf = ErgoToolConfig.load(configFile)
+    toolConf
+  }
 
-    val cmdName = cmdArgs(0)
+  def parseCmd(ctx: RunContext): Cmd = {
+    val cmdName = ctx.cmdArgs(0)
     commands.get(cmdName) match {
-      case Some(c) => c.parseCmd(cmdArgs, toolConf, console)
+      case Some(c) => c.parseCmd(ctx)
       case _ =>
         sys.error(s"Unknown command: $cmdName")
     }
   }
 
-  def printUsage(console: AKConsole): Unit = {
+  def printUsage(console: Console): Unit = {
     val actions = commands.toSeq.sortBy(_._1).map { case (name, c) =>
       s"""  $name ${c.cmdParamSyntax}\n\t${c.description}""".stripMargin
     }.mkString("\n")

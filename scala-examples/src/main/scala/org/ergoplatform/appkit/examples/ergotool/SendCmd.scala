@@ -45,12 +45,15 @@ case class SendCmd(toolConf: ErgoToolConfig, name: String, storageFile: File, st
       val signed = loggedStep(s"Signing the transaction", console) {
         senderProver.sign(tx)
       }
+      val txJson = signed.toJson(true)
+      console.println(s"Tx: $txJson")
+
       val txId = loggedStep(s"Sendng the transaction", console) {
         ctx.sendTransaction(signed)
       }
-      signed.toJson(true)
+      txId
     })
-    console.println(s"Tx: $res")
+    console.println(s"Server returned tx id: $res")
   }
 }
 object SendCmd extends CmdFactory(

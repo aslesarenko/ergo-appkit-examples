@@ -2,7 +2,7 @@ package org.ergoplatform.appkit.examples
 
 import java.io.{StringReader, ByteArrayOutputStream, BufferedReader, PrintStream}
 
-import org.ergoplatform.appkit.console.{Console, ConsoleImpl}
+import org.ergoplatform.appkit.console.{Console, TestConsole}
 import org.scalatest.Matchers
 
 trait ConsoleTesting { self: Matchers =>
@@ -11,7 +11,7 @@ trait ConsoleTesting { self: Matchers =>
     val in = new BufferedReader(new StringReader(inputText))
     val baos = new ByteArrayOutputStream()
     val out = new PrintStream(baos)
-    (new ConsoleImpl(in, out), baos)
+    (new TestConsole(in, out), baos)
   }
 
   case class WriteRead(write: String, read: String)

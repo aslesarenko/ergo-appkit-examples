@@ -26,7 +26,7 @@ object ErgoTool {
     ).map(c => (c.name, c)).toMap
 
   def main(args: Array[String]): Unit = {
-    val console = Console.instance()
+    val console = Console.instance
     run(args, console, { ctx =>
       RestApiErgoClient.create(ctx.apiUrl, ctx.networkType, ctx.apiKey)
     })

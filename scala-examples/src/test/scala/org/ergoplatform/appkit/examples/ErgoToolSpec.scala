@@ -123,7 +123,7 @@ class ErgoToolSpec extends PropSpec with Matchers with ScalaCheckDrivenPropertyC
     res should include ("26d6e08027e005270b38e5c5f4a73ffdb6d65a3289efb51ac37f98ad395d887c")
   }
 
-  property("send command (dry run)") {
+  property("send command") {
     val data = MockData(
       Seq(
         loadNodeResponse("response_Box1.json"),

@@ -3,7 +3,7 @@ package org.ergoplatform.appkit.examples
 import org.ergoplatform.appkit._
 import org.ergoplatform.appkit.config.ErgoToolConfig
 
-object FreezeCoin {
+object FreezeCoinScala {
   /**
    * Create and send transaction creating a box with the given amount using parameters from the given config file.
    *

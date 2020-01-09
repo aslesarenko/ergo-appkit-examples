@@ -5,7 +5,7 @@ lazy val sonatypeSnapshots = "Sonatype Snapshots" at "https://oss.sonatype.org/c
 resolvers ++= Seq(Resolver.mavenLocal, sonatypeReleases, sonatypeSnapshots, Resolver.mavenCentral)
 
 version := "3.1.0"
-val appkit = "org.ergoplatform" %% "ergo-appkit" % "sandboxed-fb4168bf-SNAPSHOT"
+val appkit = "org.ergoplatform" %% "ergo-appkit" % "3.1.1"
 
 libraryDependencies ++= Seq(
   appkit, (appkit % Test).classifier("tests").classifier("tests-sources"),

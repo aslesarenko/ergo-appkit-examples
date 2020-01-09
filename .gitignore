@@ -3,6 +3,7 @@
 .gradle
 .idea
 build
+target
 gradle
 /local.properties
 out/

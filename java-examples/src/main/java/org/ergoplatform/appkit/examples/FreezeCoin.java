@@ -40,8 +40,8 @@ public class FreezeCoin {
 
             ErgoProver prover = ctx.newProverBuilder()
                     .withMnemonic(
-                            nodeConf.getWallet().getMnemonic(),
-                            nodeConf.getWallet().getPassword())
+                            SecretString.create(nodeConf.getWallet().getMnemonic()),
+                            SecretString.create(nodeConf.getWallet().getPassword()))
                     .build();
 
             UnsignedTransactionBuilder txB = ctx.newTxBuilder();

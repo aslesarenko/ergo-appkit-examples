@@ -27,7 +27,9 @@ object FreezeCoinScala {
         throw new ErgoClientException(s"Not enough coins in the wallet to pay $totalToSpend", null)
 
       val prover = ctx.newProverBuilder
-        .withMnemonic(nodeConf.getWallet.getMnemonic, nodeConf.getWallet.getPassword)
+        .withMnemonic(
+          SecretString.create(nodeConf.getWallet.getMnemonic),
+          SecretString.create(nodeConf.getWallet.getPassword))
         .build()
       val txB = ctx.newTxBuilder
       val newBox = txB.outBoxBuilder
